@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>YouTube Playlist Length</title>
+		<style>
+			body {
+			  	background: #ccc;
+			  	font-family:monospace;
+			}
+			.hero {
+				background: #eee;
+				padding: 20px;
+				border-radius: 10px;
+				margin-top: 1em;
+			}
+			.hero h1 {
+				margin-top: 0;
+				margin-bottom: 0.3em;
+			}
+			.outline { 
+	            color: white;
+	            -webkit-text-stroke-width: 1px; 
+	            -webkit-text-stroke-color: #000080; 
+	        }
+		</style>
+	</head>
+	<body>
+		<div class="hero">
+			<h1>  
+				<span style="color:#FF9933;">YouTube</span>
+				<span class="outline">Playlist</span>
+				<span style="color:#138808;">Length</span>
+			</h1>
+			<p>Enter the playlist ID to find the length :</span></p>
+			<form method="POST" class="form-inline">
+				<div>
+					<input id="sstr" type="text" name="search_string">
+					<button type="submit" class="btn btn-sm btn-a">Get Length</button>
+				</div>
+			</form>
+		</div>
+		{% if display_text %}
+		<div class="hero">
+			{% for x in display_text %}
+				<p>{{x | safe}}</p>
+			{% endfor %}
+		</div>
+		{% endif %}
+	</body>
+</html>
