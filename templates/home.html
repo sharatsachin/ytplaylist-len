@@ -25,6 +25,15 @@
 	            -webkit-text-stroke-color: #000080; 
 	        }
 		</style>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-126277658-2"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+
+		  gtag('config', 'UA-126277658-2');
+		</script>
 	</head>
 	<body>
 		<div class="hero">
@@ -33,7 +42,8 @@
 				<span class="outline">Playlist</span>
 				<span style="color:#138808;">Length</span>
 			</h1>
-			<p>Enter the playlist ID to find the length :</span></p>
+			<p>Enter the playlist <span style="color:red;">ID</span> to find the length : (max length : 500)</span></p>
+			<p>(youtube.com/playlist?list=<span style="color:red;">ID</span>)</p>
 			<form method="POST" class="form-inline">
 				<div>
 					<input id="sstr" type="text" name="search_string">

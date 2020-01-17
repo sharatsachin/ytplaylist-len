@@ -9,7 +9,7 @@ url1 = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&
 url1 += '&key=AIzaSyDyBjqjA49e1Xj5mm9utbIdTf8Hr8_NN3s&playlistId={}&pageToken='
 
 url2 = 'https://www.googleapis.com/youtube/v3/videos?&part=contentDetails&id={}'
-url2 += '&key=AIzaSyDpBb_OdA6CiJPDO447RKx5YZ0G3QhNv4U&fields=items/id,items/contentDetails/duration'
+url2 += '&key=AIzaSyA15XfBwfB-gfPuLpm1tbl1p5lciN6DOII&fields=items/id,items/contentDetails/duration'
 
 def parse(a):
     ts, td = a.seconds, a.days
@@ -42,7 +42,7 @@ def home():
         next_page = ''
         cnt = 0
         a = timedelta(0)
-        display_text = ''
+        display_text = []
         while True:
             vid_list = []
             try:
@@ -63,10 +63,12 @@ def home():
                 display_text = [results['error']['message']]
                 break
             
-            if 'nextPageToken' in results:
+            if 'nextPageToken' in results and cnt < 500:
                 next_page = results['nextPageToken']
             else:
-                display_text = ['No of videos : ' + str(cnt), 'Average length of video : ' + parse(a/cnt), 'Total length of playlist : ' + parse(a), 'At 1.25x : ' + parse(a/1.25), 'At 1.50x : ' + parse(a/1.5), 'At 1.75x : ' + parse(a/1.75), 'At 2.00x : ' + parse(a/2)]
+                if cnt >= 500:
+                    display_text = ['No of videos limited to 500.']
+                display_text += ['No of videos : ' + str(cnt), 'Average length of video : ' + parse(a/cnt), 'Total length of playlist : ' + parse(a), 'At 1.25x : ' + parse(a/1.25), 'At 1.50x : ' + parse(a/1.5), 'At 1.75x : ' + parse(a/1.75), 'At 2.00x : ' + parse(a/2)]
                 break
 
         return render_template("home.html", display_text = display_text)
