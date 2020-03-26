@@ -1,79 +1,66 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-	<script src="https://kit.fontawesome.com/b9b97931ac.js" crossorigin="anonymous"></script>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-126277658-2"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        
-        gtag('config', 'UA-126277658-2');
-    </script>
-
-    <title>Youtube Playlist Length</title>
-    <link rel="icon" href="https://i.imgur.com/i3wOFEs.png">
-
-  </head>
-
-  <body>
-  	
-  	<div class="container mt-4">
-        <nav class="mb-4 navbar navbar-expand-lg navbar-light">
-            <a class="navbar-brand" href="https://ytplaylist-len.herokuapp.com/"><img src="https://i.imgur.com/PjcsUXm.png" height="60" alt=""></a>
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="https://github.com/sharatsachin/ytplaylist-len"> <img src="https://image.flaticon.com/icons/svg/25/25231.svg" height="30" alt="Github Icon"> </a>
-                </li>
-            </ul>
-        </nav>
-
-      	<hr class="my-4">
-
-		<div class="container">
-			<form method="POST">
-				  <label> Find the length of any YouTube playlist : </label>
-				<div class="input-group mb-3">
-				  <input type="text" class="form-control" placeholder="youtube.com/playlist?list=ID" name="search_string">
-				  <div class="input-group-append">
-				    <button type="submit" class="btn btn-primary">Get Length</button>
-				  </div>
-				</div>
-				  <small id="emailHelp" class="form-text text-muted">You can enter a playlist link, playlist ID or even a video link from the playlist!</small>
-			</form>
-		</div>
-        
-      	<hr class="my-4">
-
-		{% if display_text %}
-        <div class="container">
-			{% for x in display_text %}
-           	    <p>{{x | safe}}</p>
-            {% endfor %}
-		</div>
-        {% endif %}
-        
-      	<hr class="my-4">
-		
-		<footer class="page-footer font-small cyan darken-3">
-		  <!-- Copyright -->
-		  <div class="footer-copyright text-center py-3"> Made with ❤ by 
-		    <a href="https://github.com/sharatsachin/"> Sharat Sachin</a>
-		  </div>
-		</footer>
-		
-    </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  </body>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://kit.fontawesome.com/b9b97931ac.js" crossorigin="anonymous"></script>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-126277658-2"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            
+            gtag('config', 'UA-126277658-2');
+        </script>
+        <title>Youtube Playlist Length</title>
+        <link rel="icon" href="https://i.imgur.com/i3wOFEs.png">
+    </head>
+    <body>
+        <div class="container mt-4">
+            <nav class="mb-4 navbar navbar-expand-lg navbar-light">
+                <a class="navbar-brand" href="https://ytplaylist-len.herokuapp.com/"><img src="https://i.imgur.com/PjcsUXm.png" height="60" alt=""></a>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="https://github.com/sharatsachin/ytplaylist-len"> <img src="https://image.flaticon.com/icons/svg/25/25231.svg" height="30" alt="Github Icon"> </a>
+                    </li>
+                </ul>
+            </nav>
+            <hr class="my-4">
+            <div class="container">
+                <form method="POST">
+                    <label> Find the length of any YouTube playlist : </label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="youtube.com/playlist?list=ID" name="search_string">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary">Get Length</button>
+                        </div>
+                    </div>
+                    <small id="emailHelp" class="form-text text-muted">You can enter a playlist link, playlist ID or even a video link from the playlist!</small>
+                </form>
+            </div>
+            <hr class="my-4">
+            {% if display_text %}
+            <div class="container">
+                {% for x in display_text %}
+                <p>{{x | safe}}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <hr class="my-4">
+            <footer class="page-footer font-small cyan darken-3">
+                <!-- Copyright -->
+                <div class="footer-copyright text-center py-3"> Made with ❤ by 
+                    <a href="https://github.com/sharatsachin/"> Sharat Sachin</a>
+                </div>
+            </footer>
+        </div>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </body>
 </html>
