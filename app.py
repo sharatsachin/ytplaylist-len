@@ -47,7 +47,7 @@ def todayAt (hr, min=0, sec=0, micros=0):
 # find out which time slice an time lies in, to decide which API key to use
 def find_time_slice():
     timeNow = datetime.datetime.now()
-    time_slice = 1
+    time_slice = 0
     if todayAt (0) <= timeNow < todayAt (4):
         time_slice = 1
     elif todayAt (4) <= timeNow < todayAt (8):
@@ -58,8 +58,6 @@ def find_time_slice():
         time_slice = 4
     if todayAt (16) <= timeNow < todayAt (20):
         time_slice = 5
-    if todayAt (20) <= timeNow <= todayAt (23,59,59,999999):
-        time_slice = 6
     return time_slice
 
 app = Flask(__name__, static_url_path='/static')
