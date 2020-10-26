@@ -135,5 +135,9 @@ def home():
 
         return render_template("home.html", display_text = display_text)
 
+@app.route('/.well-known/brave-rewards-verification.txt')
+def static_from_root():
+    return send_from_directory(app.static_folder, 'brave-rewards-verification.txt')
+    
 if __name__ == "__main__":
     app.run(use_reloader=True, debug=False)
