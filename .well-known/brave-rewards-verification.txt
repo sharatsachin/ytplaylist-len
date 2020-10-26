@@ -1,4 +1,0 @@
-This is a Brave Rewards publisher verification file.
-
-Domain: ytplaylist-len.herokuapp.com
-Token: aae68b8a5242a8e5f0505ee6eaa406bd51edf0dc9a05294be196495df223385c
