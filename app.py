@@ -137,7 +137,7 @@ def home():
 
 @app.route('/.well-known/brave-rewards-verification.txt')
 def static_from_root():
-    return send_from_directory(app.static_folder, 'brave-rewards-verification.txt')
+    return 'This is a Brave Rewards publisher verification file.\n\nDomain: ytplaylist-len.herokuapp.com\nToken: aae68b8a5242a8e5f0505ee6eaa406bd51edf0dc9a05294be196495df223385c'
     
 if __name__ == "__main__":
     app.run(use_reloader=True, debug=False)
