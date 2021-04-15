@@ -14,7 +14,7 @@ httplib2==0.18.0
 idna==2.9
 isodate==0.6.0
 itsdangerous==1.1.0
-Jinja2==2.11.1
+Jinja2==2.11.3
 MarkupSafe==1.1.1
 oauthlib==3.1.0
 protobuf==3.11.3
