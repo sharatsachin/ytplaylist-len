@@ -1,0 +1,117 @@
+@import url(https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;500;600;700&family=Lato:wght@300&display=swap);
+* {
+    box-sizing: border-box;
+    /* border: 1px solid red; */
+}
+body {
+    font-family: Lato, sans-serif;
+    text-align: center;
+    height: 100vh;
+}
+a {
+    text-decoration: none;
+}
+.navbar {
+    height: 70px;
+    padding: 15px;
+}
+.container{
+    max-width:1100px;
+    margin:0 auto;
+    overflow:auto;
+    padding:0 20px
+}
+.flex {
+    display: flex;
+    align-items: center;
+}
+.flex__row {
+    justify-content: space-between;
+    flex-direction: row;
+}
+.flex__col {
+    justify-content: center;
+    flex-direction: column;
+}
+.main {
+    padding-bottom: 25rem;
+}
+.main h1 {
+    font-size: 65px;
+}
+.main-text {
+    margin: 10rem auto 1rem;
+}
+span {
+    color: red;
+}
+.form-control {
+    max-width: 800px;
+    width: 60vw;
+    height: 3em;
+    padding: 2px;
+    outline: none;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+.form p {
+    color:lightslategray;
+    font-size:smaller;
+}
+button {
+    cursor: pointer;
+    margin: 0.5rem auto;
+    padding: 1em 2rem;
+    border: 1px solid transparent;
+    background: red;
+    color: #fff;
+    font-size: medium;
+    font-weight: 700;
+    border-radius: 30px;
+}
+button:hover {
+    cursor: pointer;
+    margin: 0.5rem auto;
+    padding: 1em 2rem;
+    border: 1px solid transparent;
+    background: rgb(237, 40, 40);
+    color: #fff;
+    font-size: medium;
+    font-weight: 700;
+    border-radius: 30px;
+}
+.output {
+    margin: 1rem;
+}
+::placeholder {
+    text-align: center;
+    font-size: 1.2em;
+    color: black;
+}
+.footer p {
+    font-weight: 600;
+}
+@media(max-width:768px) {
+    .form-control {
+        width: 80vw;
+    }
+}
+@media(max-width:500px) {
+    .container {
+        padding:10px;
+    }
+    .main {
+        height: 70vh;
+    }
+    .main-text {
+        margin: 10rem auto 1rem;
+        padding: 1rem 0;
+    }
+    .main-text h1 {
+        font-size: xx-large;
+    }
+    .form-control {
+        width: 75vw;
+    }
+}
