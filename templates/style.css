@@ -34,7 +34,7 @@ a {
     flex-direction: column;
 }
 .main {
-    padding-bottom: 25em;
+    padding-bottom: 23em;
 }
 .main h1 {
     font-size: 65px;
@@ -92,6 +92,8 @@ button:hover {
 }
 .footer p {
     font-weight: 600;
+    margin-top: 0;
+    padding-bottom: 1px;
 }
 @media(max-width:768px) {
     .form-control {
