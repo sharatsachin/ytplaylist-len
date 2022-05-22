@@ -34,7 +34,7 @@ a {
     flex-direction: column;
 }
 .main {
-    padding-bottom: 25rem;
+    padding-bottom: 25em;
 }
 .main h1 {
     font-size: 65px;
@@ -83,6 +83,7 @@ button:hover {
 }
 .output {
     margin: 1rem;
+    padding-bottom: 2rem;
 }
 ::placeholder {
     text-align: center;
@@ -99,17 +100,17 @@ button:hover {
 }
 @media(max-width:500px) {
     .container {
-        padding:10px;
+        padding:2px;
     }
     .main {
-        height: 70vh;
+        padding-bottom: 0;
     }
     .main-text {
-        margin: 10rem auto 1rem;
-        padding: 1rem 0;
+        margin: 5rem auto 0rem;
     }
     .main-text h1 {
         font-size: xx-large;
+        margin-bottom: 10px;
     }
     .form-control {
         width: 75vw;
