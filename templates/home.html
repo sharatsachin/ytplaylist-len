@@ -1,76 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Meta tags -->
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+        <meta name="viewport" content="width=device-width" />
+
+        <!-- Favicon and title -->
+        <link rel="icon" href="{{url_for('static', filename='favicon.png')}}" />
+        <title>YouTube Playlist Length</title>
+
         <script src="https://kit.fontawesome.com/b9b97931ac.js" crossorigin="anonymous"></script>
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-126277658-2"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            
-            gtag('config', 'UA-126277658-2');
-        </script>
-        <script async="async" data-cfasync="false" src="//pl15800819.toprevenuenetwork.com/4a026dc80759484ad2fe6f56f58877de/invoke.js"></script>
-        <title>Youtube Playlist Length</title>
-        <link rel="icon" href="https://i.imgur.com/i3wOFEs.png">
+        <!-- Halfmoon CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/css/halfmoon-variables.min.css" rel="stylesheet" />
     </head>
-    <body>
-        <div class="container mt-4">
-            <nav class="mb-4 navbar navbar-expand-lg navbar-light">
-                <a class="navbar-brand" href="https://ytplaylist-len.herokuapp.com/"><img src="https://i.imgur.com/PjcsUXm.png" height="60" alt=""></a>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="https://github.com/sharatsachin/ytplaylist-len">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30 fill="currentColor" class="bi bi-github" viewBox="0 0 30 30">
-                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                            </svg>
-                        </a>
-                    </li>
-                </ul>
+    <body
+        class="with-custom-webkit-scrollbars with-custom-css-scrollbars"
+        data-dm-shortcut-enabled="true"
+        data-set-preferred-mode-onload="true"
+    >
+    
+        <div class="page-wrapper with-navbar with-navbar-fixed-bottom">
+            <div class="sticky-alerts"></div>
+
+            <!-- Navbar start -->
+            <nav class="navbar h-100 bg-light-lm">
+                <div class="container-lg">
+                    <a href="https://ytplaylist-len.herokuapp.com/">
+                        <img
+                            src="{{url_for('static', filename='logo.png')}}"
+                            height="60"
+                            alt="YouTube Playlist Length"
+                        />
+                    </a>
+                    <span class="navbar-text text-monospace">
+                        <span class="badge badge-danger text-dark-dm text-white-lm"> v2.0</span>
+                    </span>
+
+                    <!-- <a class="nav-link ml-auto" href="https://github.com/sharatsachin/ytplaylist-len">
+                        <img src="https://i.imgur.com/9pkk0rW.png" height="30" alt="Github Icon" />
+                    </a> -->
+                    <button
+                        class="btn btn-lg btn-square ml-auto text-danger"
+                        type="button"
+                        onclick="halfmoon.toggleDarkMode()"
+                    >
+                        <i class="fa fa-moon-o" aria-hidden="true"></i>
+                        <span class="sr-only">Toggle dark mode</span>
+                    </button>
+
+                    <a href="https://github.com/sharatsachin/ytplaylist-len">
+                        <button class="btn btn-lg btn-square ml-5 text-danger">
+                            <i class="fab fa-github" aria-hidden="true"></i>
+                            <span class="sr-only">Toggle dark mode</span>
+                        </button>
+                    </a>
+                </div>
             </nav>
-            <hr class="my-4">
-            <div class="container">
-                <form method="POST">
-                    <label> Find the length of any YouTube playlist : </label>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="youtube.com/playlist?list=ID" name="search_string">
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-primary">Get Length</button>
-                        </div>
+            <!-- Navbar end -->
+
+            <!-- Content wrapper start -->
+            <div class="content-wrapper mt-20">
+                <div class="container px-20 h-50"></div>
+                <div class="container">
+                    <div class="content">
+                        <h2 class="content-title">Find the length of any YouTube playlist:</h2>
+                        <form method="POST">
+                            <div class="input-group">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="youtube.com/playlist?list=ID"
+                                    name="search_string"
+                                />
+                                <div class="input-group-append">
+                                    <!-- <button type="submit" class="btn btn-primary">Analyze</button> -->
+
+                                    <button class="btn btn-primary ml-5 text-dark-dm shadow-none">Analyze</button>
+                                </div>
+                            </div>
+                            <div id="emailHelp" class="form-text content mx-0 my-5">
+                                You can enter a playlist link, playlist ID or even a video link from the playlist!
+                                <br />
+                                This only works with playlists with upto 500 videos. Need more than that?
+                                <a href="https://colab.research.google.com/drive/1D0nbJVcFMHmQyNFVpoL65LOUiejA-bAc"
+                                    >Check here.</a
+                                >
+                            </div>
+                        </form>
                     </div>
-                    <small id="emailHelp" class="form-text text-muted">
-                    	You can enter a playlist link, playlist ID or even a video link from the playlist!
-                    	<br> This only works with playlists with upto 500 videos. Need more than that? <a href="https://colab.research.google.com/drive/1D0nbJVcFMHmQyNFVpoL65LOUiejA-bAc">Check here.</a>
-                    </small>
-                </form>
-            </div>
-            <hr class="my-4">
-            {% if display_text %}
-            <div class="container">
-                {% for x in display_text %}
-                <p>{{x | safe}}</p>
-                {% endfor %}
-            </div>
-            {% endif %}
-            <hr class="my-4">
-            <footer class="page-footer font-small cyan darken-3">
-                <div class="footer-copyright text-center py-3">
-                	Made with ❤ by <a href="https://github.com/sharatsachin/"> Sharat Sachin</a>
                 </div>
-                <div class="footer-copyright text-center py-3">
-                    If you found this app helpful, you can support me by <a href="https://www.buymeacoffee.com/sharat"> buying me a pizza here.</a>
+
+                <div class="container">
+                    <div class="content">
+                        {% if display_text %}
+                        {% for x in display_text %}
+                            <p>{{x | safe}}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
                 </div>
-            </footer>
+            </div>
+            <!-- Content wrapper end -->
+
+            <!-- Navbar fixed bottom start -->
+            <nav class="navbar navbar-fixed-bottom bg-light-lm">
+                <div class="footer-content mx-auto">
+                    Made with ❤ by <a href="https://github.com/sharatsachin/"> Sharat Sachin</a>.
+                    Buy me a <a href="https://ko-fi.com/sharat">coffee.</a>
+                </div>
+            </nav>
+            <!-- Navbar fixed bottom end -->
         </div>
-        <!-- Optional JavaScript -->
-        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <!-- Page wrapper end -->
+
+        <script src="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/js/halfmoon.min.js"></script>
+        <script>
+            // dark mode toggler
+            function toggleDemo() {
+                halfmoon.toggleDarkMode();
+            }
+        </script>
     </body>
 </html>
