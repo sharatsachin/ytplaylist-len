@@ -139,6 +139,11 @@ def home():
         return render_template("home.html", display_text=display_text)
 
 
+@app.route("/healthz", methods=['GET', 'POST'])
+def healthz():
+    return "Success", 200    
+    
+    
 @app.route('/.well-known/brave-rewards-verification.txt')
 def static_from_root():
     return Response(
