@@ -151,5 +151,12 @@ def static_from_root():
         mimetype='text/plain')
 
 
+@app.route('/ads.txt')
+def static_from_root():
+    return Response(
+        'google.com, pub-8874895270666721, DIRECT, f08c47fec0942fa0',
+        mimetype='text/plain')
+
+
 if __name__ == "__main__":
     app.run(use_reloader=True, debug=False)
