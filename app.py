@@ -145,14 +145,14 @@ def healthz():
     
     
 @app.route('/.well-known/brave-rewards-verification.txt')
-def static_from_root():
+def static_from_root_brave():
     return Response(
         'This is a Brave Rewards publisher verification file.\n\nDomain: ytplaylist-len.herokuapp.com\nToken: aae68b8a5242a8e5f0505ee6eaa406bd51edf0dc9a05294be196495df223385c',
         mimetype='text/plain')
 
 
 @app.route('/ads.txt')
-def static_from_root():
+def static_from_root_google():
     return Response(
         'google.com, pub-8874895270666721, DIRECT, f08c47fec0942fa0',
         mimetype='text/plain')
