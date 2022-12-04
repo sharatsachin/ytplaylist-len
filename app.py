@@ -1,5 +1,5 @@
 from datetime import timedelta
-from flask import Flask, Response, request, render_template, redirect
+from flask import Flask, Response, request, render_template
 import datetime
 import isodate
 import json
@@ -68,13 +68,7 @@ def find_time_slice():
 app = Flask(__name__, static_url_path='/static')
 
 
-
 @app.route("/", methods=['GET', 'POST'])
-def redirector():
-    return redirect("https://ytplaylist-len.sharats.dev", code=301)
-
-
-@app.route("/old", methods=['GET', 'POST'])
 def home():
     if (request.method == 'GET'):
         return render_template("home.html")
