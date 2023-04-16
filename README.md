@@ -4,7 +4,7 @@
 This is a **simple web application** that allows users to obtain the total length of any **YouTube playlist**. You can access the app by following this [link](https://ytplaylist-len.sharats.dev/).
 
 <p align="center">
-  <img src="static/homepagelightmode.png#gh-dark-mode-only" alt="Home Page Light Mode" >
+  <img src="static/homepagemode.png#gh-dark-mode-only" alt="Home Page Light Mode" >
   <img src="static/homepagedarkmode.png#gh-light-mode-only" alt="Home Page Light Mode">
   <br>
   <img height="40" src="static/django.png"> 
