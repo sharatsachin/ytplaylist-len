@@ -7,7 +7,7 @@ This is a **simple web application** that allows users to obtain the total lengt
   <img src="static/homepagelightmode.png#gh-dark-mode-only" alt="Home Page Light Mode" >
   <img src="static/homepagedarkmode.png#gh-light-mode-only" alt="Home Page Light Mode">
   <br>
-  <img height="70" src="static/django.png"> 
+  <img height="40" src="static/django.png"> 
 </p>
 
 
