@@ -7,7 +7,8 @@ This is a **simple web application** that allows users to obtain the total lengt
   <img src="static/homepagelightmode.png#gh-dark-mode-only" alt="Home Page Light Mode" >
   <img src="static/homepagedarkmode.png#gh-light-mode-only" alt="Home Page Light Mode">
   <br>
-  Django | python 
+  <code><img height="50" src="static/django.png"></code>
+  <code><img height="30" src="static/python.png"></code>
 </p>
 
 
@@ -60,7 +61,7 @@ This app is deployed on Render.com, a cloud platform that offers simple and seam
 
 If you've got questions about setup, deploying, special feature implementation, or just want to chat with the developer, please feel free to contact me.
 
-**Found a bug?** Go ahead and submit an issue. And, of course, feel free to submit pull requests with bug fixes or changes to the dev branch. Contributions to this project are always welcome. If you would like to contribute, simply fork the repository and submit a pull request. Your contributions will be greatly appreciated!
+**Found a bug?** Go ahead and submit an [issue](https://github.com/sharatsachin/ytplaylist-len/issues). And, of course, contributions to this project are always welcome. If you would like to contribute, simply fork the repository and submit a pull request. Your contributions will be greatly appreciated!
 
 ## Thanks
 
