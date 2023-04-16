@@ -7,11 +7,11 @@ This is a **simple web application** that allows users to obtain the total lengt
   <img src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/homepage.png#gh-dark-mode-only" alt="Home Page Light Mode" >
   <img src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/homepagedarkmode.png#gh-light-mode-only" alt="Home Page Light Mode">
   <br>
-  <img height="40" src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/django.png"> 
+  <img height="40" src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/flask.png"> 
 </p>
 
 
-The app is built using **django**. It utilizes the **YouTube API** to retrieve playlist information and display the total length of the playlist in hours, minutes, and seconds.
+The app is built using **flask**. It utilizes the **YouTube API** to retrieve playlist information and display the total length of the playlist in hours, minutes, and seconds.
 
 
 ## Features
@@ -64,5 +64,5 @@ If you've got questions about setup, deploying, special feature implementation, 
 
 ## Thanks
 
-* [Django](https://www.djangoproject.com/) a high-level Python web framework that encourages rapid development and clean, pragmatic design.
+* [Flask](https://flask.palletsprojects.com/) a Python web framework that encourages rapid development and clean, pragmatic design.
 * [python](https://www.python.org/) a powerful and versatile programming language that is widely used in many fields.
