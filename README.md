@@ -7,7 +7,9 @@ This is a **simple web application** that allows users to obtain the total lengt
   <img src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/homepage.png#gh-dark-mode-only" alt="Home Page Light Mode" >
   <img src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/homepagedarkmode.png#gh-light-mode-only" alt="Home Page Light Mode">
   <br>
-  <img height="40" src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/flask.png"> 
+  <img height="30" src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/flaskicon.png"> 
+  &nbsp
+  <img height="30" src="https://github.com/ThilakReddyy/ytplaylist-len/blob/master/static/python.png"> 
 </p>
 
 
