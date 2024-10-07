@@ -8,7 +8,6 @@ import requests
 import os
 
 APIS = os.environ['APIS'].strip('][').split(',')
-
 URL1 = 'https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&fields=items/contentDetails/videoId,nextPageToken&key={}&playlistId={}&pageToken='
 URL2 = 'https://www.googleapis.com/youtube/v3/videos?&part=contentDetails&id={}&key={}&fields=items/contentDetails/duration'
 
@@ -70,74 +69,90 @@ app = Flask(__name__, static_url_path='/static')
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    if (request.method == 'GET'):
+    if request.method == 'GET':
         return render_template("home.html")
-
     else:
-
-        # get playlist link/id as input from the form
-        playlist_link = request.form.get('search_string').strip()
+        # Get playlist link/id as input from the form
+        playlist_link = request.form.get('search_string', '').strip()
         playlist_id = get_id(playlist_link)
-
-        # initializing variables
-        next_page = ''  # to hold next_page token, empty for first page
-        cnt = 0  # stores number of videos in playlist
-        a = timedelta(0)  # to store total length of playlist
-        tsl = find_time_slice()
-        display_text = []  # list to contain final text to be displayed, one item per line
-
+        
+        # Get starting video number from the form
+        start_video_input = request.form.get('start_video', '').strip()
+        try:
+            start_video = int(start_video_input)
+            if start_video < 1:
+                start_video = 1
+        except ValueError:
+            start_video = 1  # Default to 1 if input is invalid or empty
+        
+        # Initialize variables
+        next_page = ''  # To hold next_page token, empty for first page
+        total_videos = 0  # Total number of videos processed
+        cnt = 0  # Number of videos counted (from start_video onwards)
+        a = timedelta(0)  # To store total length of playlist
+        # tsl = find_time_slice()
+        tsl = find_time_slice() % len(APIS)
+        display_text = []  # List to contain final text to be displayed
+        
         print(APIS[tsl])
-        # when we make requests, we get the response in pages of 50 items
-        # which we process one page at a time
+        
+        # Process the playlist items page by page
         while True:
-            vid_list = []
-
+            adjusted_vid_list = []
             try:
-                # make first request to get list of all video_id one page of response
+                # Make request to get list of video IDs for one page
                 print(URL1.format(APIS[tsl].strip("'"), playlist_id))
-                results = json.loads(requests.get(URL1.format(APIS[tsl].strip("'"), playlist_id) + next_page).text)
-
-                # add all ids to vid_list
-                for x in results['items']:
-                    vid_list.append(x['contentDetails']['videoId'])
-
-            except KeyError:
-                display_text = [results['error']['message']]
+                response = requests.get(URL1.format(APIS[tsl].strip("'"), playlist_id) + next_page)
+                results = response.json()
+                
+                # Process each item and check if it should be included
+                for x in results.get('items', []):
+                    total_videos += 1
+                    if total_videos >= start_video:
+                        adjusted_vid_list.append(x['contentDetails']['videoId'])
+            except KeyError as e:
+                display_text = [f"Error retrieving playlist items: {e}"]
                 break
-
-            # now vid_list contains list of all videos in playlist one page of response
-            url_list = ','.join(vid_list)
-            # updating counter
-            cnt += len(vid_list)
-
-            try:
-                # now to get the durations of all videos in url_list
-                op = json.loads(requests.get(URL2.format(url_list, APIS[tsl].strip("'"))).text)
-
-                # add all the durations to a
-                for x in op['items']:
-                    a += isodate.parse_duration(x['contentDetails']['duration'])
-
-            except KeyError:
-                display_text = [results['error']['message']]
-                break
-
-            # if 'nextPageToken' is not in results, it means it is the last page of the response
-            # otherwise, or if the cnt has not yet exceeded 500
+            
+            # If there are videos to process, fetch their durations
+            if adjusted_vid_list:
+                url_list = ','.join(adjusted_vid_list)
+                cnt += len(adjusted_vid_list)
+                try:
+                    # Get the durations of all videos in adjusted_vid_list
+                    op_response = requests.get(URL2.format(url_list, APIS[tsl].strip("'")))
+                    op = op_response.json()
+                    
+                    # Add all the durations to 'a'
+                    for x in op.get('items', []):
+                        a += isodate.parse_duration(x['contentDetails']['duration'])
+                except KeyError as e:
+                    display_text = [f"Error retrieving video durations: {e}"]
+                    break
+            
+            # Check if there is a next page or if we've reached the limit
             if 'nextPageToken' in results and cnt < 500:
                 next_page = results['nextPageToken']
             else:
                 if cnt >= 500:
-                    display_text = ['No of videos limited to 500.']
-                display_text += [
-                    'No of videos : ' + str(cnt), 'Average length of video : ' + parse(a / cnt),
-                    'Total length of playlist : ' + parse(a), 'At 1.25x : ' + parse(a / 1.25),
-                    'At 1.50x : ' + parse(a / 1.5), 'At 1.75x : ' + parse(a / 1.75), 'At 2.00x : ' + parse(a / 2)
-                ]
+                    display_text.append('Number of videos limited to 500.')
+                
+                if cnt > 0:
+                    # Calculate and display the results
+                    display_text += [
+                        f'Number of videos: {cnt}',
+                        f'Average length of video: {parse(a / cnt)}',
+                        f'Total length of playlist: {parse(a)}',
+                        f'At 1.25x speed: {parse(a / 1.25)}',
+                        f'At 1.50x speed: {parse(a / 1.5)}',
+                        f'At 1.75x speed: {parse(a / 1.75)}',
+                        f'At 2.00x speed: {parse(a / 2)}',
+                    ]
+                else:
+                    display_text.append(f'No videos found starting from video number {start_video}.')
                 break
-
+        
         return render_template("home.html", display_text=display_text)
-
 
 @app.route("/healthz", methods=['GET', 'POST'])
 def healthz():
