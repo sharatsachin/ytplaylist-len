@@ -1,2 +1,5 @@
 venv/
 .vscode/
+.env
+*.pyc
+*.code-workspace
