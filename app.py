@@ -298,7 +298,6 @@ class Playlist:
             output_string.append(
                 f"At {self.custom_speed:.2f}x : {parse(self.total_duration / self.custom_speed)}"
             )
-
         return output_string
 
 
@@ -339,6 +338,8 @@ async def home(
 
     except Exception as e:
         output = [[f"Error: {e}"]]
+
+    print(output)
 
     return templates.TemplateResponse(
         "home.html", {"request": request, "playlist_detail": output}
