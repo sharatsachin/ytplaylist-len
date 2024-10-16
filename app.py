@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Annotated, Tuple, Optional
 from fastapi import FastAPI, Form, Request, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import datetime
@@ -346,17 +346,14 @@ async def home(
     )
 
 
-@fapp.route("/healthz", methods=["GET", "POST"])
+@fapp.get("/healthz")
 def healthz():
-    return "Success", 200
+    return "Success"
 
 
-@fapp.route("/ads.txt")
+@fapp.get("/ads.txt", response_class=PlainTextResponse)
 def static_from_root_google():
-    return Response(
-        "google.com, pub-8874895270666721, DIRECT, f08c47fec0942fa0",
-        mimetype="text/plain",
-    )
+    return "google.com, pub-8874895270666721, DIRECT, f08c47fec0942fa0"
 
 
 if __name__ == "__main__":
