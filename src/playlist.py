@@ -6,13 +6,18 @@ from datetime import timedelta
 import redis
 import asyncio
 
+from pymongo import MongoClient
 from src.utils import call_youtube_api, parse
 from src.video import Video
 
 REDIS_URL = os.environ["REDIS_URL"]
+MONGO_URL = os.environ["MONGO_URL"]
 CACHE_TTL = 60 * 60 * 24  # 24 hours
 
 redis_client = redis.from_url(REDIS_URL)
+mongo_collection = MongoClient(os.environ["MONGO_URL"])["ytplaylistdb"][
+    "ytplaylistcounts"
+]
 
 
 class Playlist:
@@ -67,8 +72,15 @@ class Playlist:
     def __repr__(self):
         return f"Playlist(playlist_id={self.playlist_id}, video_count={self.video_count}, total_duration={self.total_duration}, average_duration={self.average_duration})"
 
+    def increment_playlist_count(self, playlist_id):
+        mongo_collection.update_one(
+            {"playlist_id": playlist_id}, {"$inc": {"count": 1}}, upsert=True
+        )
+
     def get_video_list_from_cache(self, playlist_id):
         key = f"playlist:{playlist_id}"
+        self.increment_playlist_count(playlist_id)
+
         cached_data = redis_client.get(key)
         if cached_data:
             self.videos = [
