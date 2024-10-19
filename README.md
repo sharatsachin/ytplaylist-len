@@ -10,10 +10,9 @@ Analyze YouTube playlists and videos with ease! Get detailed information about v
 - 🔢 Support for custom playback speeds
 - 📅 View average video length in playlists
 - 🔍 Analyze specific video ranges within playlists
+- 📈 Asynchronous requests and caching layer to speed up processing
 
-## 🚧 Future additions (if I ever get around to it) 
-- [ ] Add support for asynchronous requests to speed up the process
-- [ ] Add caching layer to reduce API calls
+## 🚧 Future additions (if I ever get around to it)
 - [ ] Add more analytics related to the videos (like average views, likes, etc.)
 
 ## 🚀 Getting Started

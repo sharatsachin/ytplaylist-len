@@ -1,0 +1,156 @@
+import json
+import logging
+import os
+from datetime import timedelta
+
+import redis
+import asyncio
+
+from src.utils import call_youtube_api, parse
+from src.video import Video
+
+REDIS_URL = os.environ["REDIS_URL"]
+CACHE_TTL = 60 * 60 * 24  # 24 hours
+
+redis_client = redis.from_url(REDIS_URL)
+
+
+class Playlist:
+    def __init__(
+        self,
+        playlist_id,
+        custom_speed=None,
+        start_range=None,
+        end_range=None,
+        youtube_api=None,
+    ):
+        self.playlist_id = playlist_id
+        self.next_page = ""  # for pagination
+        self.total_duration = timedelta(0)  # total duration
+        self.custom_speed = custom_speed
+        self.start_range = start_range
+        self.end_range = end_range
+        self.youtube_api = youtube_api
+
+    async def do_async_work(self):
+
+        found = self.get_video_list_from_cache(self.playlist_id)
+        if found:
+            logging.info(f"Playlist {self.playlist_id} found in cache.")
+        else:
+            logging.info(f"Playlist {self.playlist_id} not found in cache.")
+            await self.get_video_ids_list()
+            await self.get_videos_details()
+            self.save_to_cache()
+
+        self.available_count = sum([x.considered for x in self.videos])
+        self.unavailable_count = len(self.videos) - self.available_count
+        self.total_duration = sum([x.duration for x in self.videos], timedelta(0))
+        self.average_duration = self.total_duration / self.available_count
+        self.video_count = len(self.videos)
+        self.start_range = max(1, self.start_range) if self.start_range else 1
+        self.end_range = (
+            min(self.available_count, self.end_range)
+            if self.end_range
+            else self.available_count
+        )
+
+        if self.start_range and self.end_range:
+            self.videos_range = self.videos[self.start_range - 1 : self.end_range]
+            self.total_duration = sum(
+                [x.duration for x in self.videos_range], timedelta(0)
+            )
+            self.available_count = sum([x.considered for x in self.videos_range])
+            self.unavailable_count = len(self.videos_range) - self.available_count
+            self.average_duration = self.total_duration / self.available_count
+
+    def __repr__(self):
+        return f"Playlist(playlist_id={self.playlist_id}, video_count={self.video_count}, total_duration={self.total_duration}, average_duration={self.average_duration})"
+
+    def get_video_list_from_cache(self, playlist_id):
+        key = f"playlist:{playlist_id}"
+        cached_data = redis_client.get(key)
+        if cached_data:
+            self.videos = [
+                Video(video_id=None, video_data=video_data)
+                for video_data in json.loads(cached_data)
+            ]
+            return True
+        return False
+
+    def save_to_cache(self):
+        jsonified_videos = json.dumps([video.to_dict() for video in self.videos])
+        key = f"playlist:{self.playlist_id}"
+        redis_client.setex(key, CACHE_TTL, jsonified_videos)
+
+    async def get_video_ids_list(self):
+
+        self.video_ids = []
+        while True:
+            results = await call_youtube_api(
+                "playlistItems",
+                api=self.youtube_api,
+                playlistId=self.playlist_id,
+                pageToken=self.next_page,
+            )
+            self.video_ids += [x["contentDetails"]["videoId"] for x in results["items"]]
+
+            if "nextPageToken" in results and len(self.video_ids) < 500:
+                self.next_page = results["nextPageToken"]
+            else:
+                break
+
+    async def get_videos_details(self):
+
+        self.videos = []
+        for i in range(0, len(self.video_ids), 50):
+            video_ids = self.video_ids[i : i + 50]
+            video_data = await call_youtube_api(
+                "videos", api=self.youtube_api, video_ids=video_ids
+            )
+
+            for id, data in zip(video_ids, video_data["items"]):
+                video = Video(id, data, self.custom_speed)
+                self.videos.append(video)
+
+    async def get_videos_details(self):
+
+        self.videos = []
+        chunks = [self.video_ids[i : i + 50] for i in range(0, len(self.video_ids), 50)]
+        tasks = [
+            call_youtube_api("videos", api=self.youtube_api, video_ids=chunk)
+            for chunk in chunks
+        ]
+        responses = await asyncio.gather(*tasks)
+
+        for chunk, video_data in zip(chunks, responses):
+            for video_id, data in zip(chunk, video_data["items"]):
+                video = Video(video_id, data, self.custom_speed)
+                self.videos.append(video)
+
+    def get_output_string(self):
+        output_string = [
+            "Playlist : " + self.playlist_name,
+            "ID : " + self.playlist_id,
+            "Creator : " + self.playlist_creator,
+        ]
+
+        if self.video_count >= 500:
+            output_string.append("No of videos limited to 500.")
+
+        output_string += [
+            f"Video count : {self.available_count} (from {self.start_range} to {self.end_range}) ({self.unavailable_count} unavailable)",
+            "Average video length : "
+            + parse(self.total_duration / self.available_count),
+            "Total length : " + parse(self.total_duration),
+            "At 1.25x : " + parse(self.total_duration / 1.25),
+            "At 1.50x : " + parse(self.total_duration / 1.5),
+            "At 1.75x : " + parse(self.total_duration / 1.75),
+            "At 2.00x : " + parse(self.total_duration / 2),
+        ]
+
+        if self.custom_speed:
+            output_string.append(
+                f"At {self.custom_speed:.2f}x : {parse(self.total_duration / self.custom_speed)}"
+            )
+        return output_string
