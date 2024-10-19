@@ -29,7 +29,9 @@ class Video:
         self.title = video_data["snippet"]["title"]
         self.channel = video_data["snippet"]["channelTitle"]
         self.published = video_data["snippet"]["publishedAt"]
-        self.duration = isodate.parse_duration(video_data["contentDetails"]["duration"])
+        self.duration = isodate.parse_duration(
+            video_data["contentDetails"].get("duration", "PT0S")
+        )
         self.views = video_data["statistics"].get("viewCount", 0)
         self.likes = video_data["statistics"].get("likeCount", 0)
         self.comments = video_data["statistics"].get("commentCount", 0)
