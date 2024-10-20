@@ -52,8 +52,7 @@ async def home(
         range_start, range_end = range_end, range_start
 
     try:
-        logger.info(f"Input: {search_string}")
-        logger.info(f"Time slice: {find_time_slice()}")
+        logger.info(f"Input TS({find_time_slice()}): {search_string}")
         youtube_api = youtube_api if youtube_api else YOUTUBE_APIS[find_time_slice()]
         items = ItemList(
             search_string, range_start, range_end, custom_speed, youtube_api
@@ -63,8 +62,7 @@ async def home(
 
     except Exception as e:
         output = [[f"Error: {e}"]]
-
-    logger.info(f"Output: {output}")
+        logger.error(f"{output}")
 
     return templates.TemplateResponse(
         "home.html", {"request": request, "playlist_detail": output}
