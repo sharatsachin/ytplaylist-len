@@ -40,10 +40,8 @@ class Playlist:
     async def do_async_work(self):
 
         found = self.get_video_list_from_cache(self.playlist_id)
-        if found:
-            logging.info(f"Playlist {self.playlist_id} found in cache.")
-        else:
-            logging.info(f"Playlist {self.playlist_id} not found in cache.")
+        logging.info(f"Playlist {self.playlist_id} in cache: {found}")
+        if not found:
             await self.get_video_ids_list()
             await self.get_videos_details()
             self.save_to_cache()
@@ -73,27 +71,37 @@ class Playlist:
         return f"Playlist(playlist_id={self.playlist_id}, video_count={self.video_count}, total_duration={self.total_duration}, average_duration={self.average_duration})"
 
     def increment_playlist_count(self, playlist_id):
-        mongo_collection.update_one(
-            {"playlist_id": playlist_id}, {"$inc": {"count": 1}}, upsert=True
-        )
+        try:
+            mongo_collection.update_one(
+                {"playlist_id": playlist_id}, {"$inc": {"count": 1}}, upsert=True
+            )
+        except Exception as e:
+            logging.error(f"Error incrementing playlist count for {playlist_id}: {e}")
 
     def get_video_list_from_cache(self, playlist_id):
         key = f"playlist:{playlist_id}"
         self.increment_playlist_count(playlist_id)
 
-        cached_data = redis_client.get(key)
-        if cached_data:
-            self.videos = [
-                Video(video_id=None, video_data=video_data)
-                for video_data in json.loads(cached_data)
-            ]
-            return True
+        try:
+            cached_data = redis_client.get(key)
+            if cached_data:
+                self.videos = [
+                    Video(video_id=None, video_data=video_data)
+                    for video_data in json.loads(cached_data)
+                ]
+                return True
+        except Exception as e:
+            logging.error(f"Error retrieving cache for {playlist_id}: {e}")
+
         return False
 
     def save_to_cache(self):
-        jsonified_videos = json.dumps([video.to_dict() for video in self.videos])
-        key = f"playlist:{self.playlist_id}"
-        redis_client.setex(key, CACHE_TTL, jsonified_videos)
+        try:
+            jsonified_videos = json.dumps([video.to_dict() for video in self.videos])
+            key = f"playlist:{self.playlist_id}"
+            redis_client.setex(key, CACHE_TTL, jsonified_videos)
+        except Exception as e:
+            logging.error(f"Error saving to cache for playlist {self.playlist_id}: {e}")
 
     async def get_video_ids_list(self):
 

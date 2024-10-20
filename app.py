@@ -17,9 +17,7 @@ from src.utils import find_time_slice
 
 YOUTUBE_APIS = os.environ["APIS"].split(";")
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 fapp = FastAPI()
@@ -80,4 +78,6 @@ def static_from_root_google():
 
 
 if __name__ == "__main__":
-    fapp.run(use_reloader=True, debug=False, host="0.0.0.0", port=10000)
+    fapp.run(
+        use_reloader=True, debug=False, host="0.0.0.0", port=10000, access_log=False
+    )
