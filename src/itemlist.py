@@ -4,7 +4,7 @@ import re
 from typing import Tuple
 
 from src.playlist import Playlist
-from src.utils import call_youtube_api
+from src.utils import call_youtube_api, find_time_slice
 from src.video import Video
 
 
@@ -55,6 +55,9 @@ class ItemList:
                 self.playlist_ids = []
                 return
         except KeyError:
+            logging.error(find_time_slice())
+            logging.error(self.youtube_api)
+            logging.error(results)
             raise Exception(results["error"]["message"])
 
         for id, data in zip(self.playlist_ids, results["items"]):
