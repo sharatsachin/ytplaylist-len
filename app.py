@@ -15,7 +15,7 @@ from fastapi.templating import Jinja2Templates
 from src.itemlist import ItemList
 from src.utils import find_time_slice
 
-YOUTUBE_API = os.environ["APIS"].split(";")[find_time_slice()]
+YOUTUBE_APIS = os.environ["APIS"].split(";")
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -52,7 +52,9 @@ async def home(
         range_start, range_end = range_end, range_start
 
     try:
-        youtube_api = youtube_api if youtube_api else YOUTUBE_API
+        logger.info(f"Input: {search_string}")
+        logger.info(f"Time slice: {find_time_slice()}")
+        youtube_api = youtube_api if youtube_api else YOUTUBE_APIS[find_time_slice()]
         items = ItemList(
             search_string, range_start, range_end, custom_speed, youtube_api
         )
@@ -62,7 +64,6 @@ async def home(
     except Exception as e:
         output = [[f"Error: {e}"]]
 
-    logger.info(f"Input: {search_string}")
     logger.info(f"Output: {output}")
 
     return templates.TemplateResponse(
