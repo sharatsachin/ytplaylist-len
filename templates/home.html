@@ -1,168 +1,195 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
-    <!-- Meta tags -->
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
-    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
         content="Get the total length/duration of a YouTube playlist by passing its link as input. You get the time required to watch that playlist at different speeds.">
 
-
-    <!-- Favicon and title -->
     <link rel="icon" href="{{url_for('static', path='/favicon.png')}}" />
     <title>YouTube Playlist Length</title>
 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6W24HY1SKP"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-6W24HY1SKP');
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
         crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"
-        crossorigin="anonymous"></script>
-    <!-- Halfmoon CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/css/halfmoon-variables.min.css" rel="stylesheet" />
 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        if (localStorage.theme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        crossorigin="anonymous" />
     <script src="{{url_for('static', path='/form_validation.js')}}"></script>
 </head>
 
-<body class="with-custom-webkit-scrollbars with-custom-css-scrollbars" data-dm-shortcut-enabled="true"
-    data-set-preferred-mode-onload="true">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div class="flex flex-col min-h-screen">
 
-    <div class="page-wrapper with-navbar with-navbar-fixed-bottom">
-        <div class="sticky-alerts"></div>
-
-        <!-- Navbar start -->
-        <nav class="navbar h-100 bg-light-lm">
-            <div class="container-lg">
-                <a href="https://ytplaylist-len.sharats.dev/">
-                    <img src="{{url_for('static', path='/logo.png')}}" height="60" alt="YouTube Playlist Length" />
+        <!-- Navbar -->
+        <nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
+            <div class="max-w-5xl mx-auto px-6 h-16 flex items-center gap-3">
+                <a href="/" class="flex items-center">
+                    <img src="{{url_for('static', path='/logo.png')}}" alt="YouTube Playlist Length" class="h-11" />
                 </a>
-                <span class="navbar-text text-monospace">
-                    <span class="badge badge-danger text-dark-dm text-white-lm"> v3.0</span>
-                </span>
-                <button class="btn btn-lg btn-square ml-auto text-danger" type="button"
-                    onclick="halfmoon.toggleDarkMode()">
-                    <i class="fa fa-moon" aria-hidden="true"></i>
-                    <span class="sr-only">Toggle dark mode</span>
-                </button>
-
-                <a href="https://github.com/sharatsachin/ytplaylist-len">
-                    <button class="btn btn-lg btn-square ml-5 text-danger">
-                        <i class="fab fa-github" aria-hidden="true"></i>
-                        <span class="sr-only">Toggle dark mode</span>
+                <span class="text-xs font-mono bg-red-600 text-white px-2 py-0.5 rounded-full select-none">v3.0</span>
+                <div class="ml-auto flex items-center gap-1">
+                    <button onclick="toggleDarkMode()"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        aria-label="Toggle dark mode">
+                        <i class="fa fa-moon text-sm"></i>
                     </button>
-                </a>
-            </div>
-        </nav>
-        <!-- Navbar end -->
-
-        <!-- Content wrapper start -->
-        <div class="content-wrapper mt-20">
-            <div class="container px-20 h-50"></div>
-            <div class="container">
-                <div class="content">
-                    <h2 class="content-title">Find the length of any YouTube playlist:</h2>
-                    <form method="POST" onsubmit="return validateForm()">
-                        <div class="form-text content mx-0 my-5">
-                            You can enter a playlist link, playlist ID or even a video link from the playlist!
-                            <br />
-                            You can also enter a single video link or list of playlist links.
-                        </div>
-                        <div class="input-group">
-                            <textarea autofocus="autofocus" class="form-control"
-                                placeholder="youtube.com/playlist?list=ID1&#10;youtube.com/playlist?list=ID2"
-                                name="search_string" rows="10" required></textarea>
-                        </div>
-                        <div class="form-text content mx-0 my-5">
-                            Optionally, enter a range of videos to analyze in the first link. Leave blank to analyze the
-                            entire playlist.
-                            <br />
-                            You can also enter a custom speed (like 2.25), and a YouTube API key to use your own.
-                        </div>
-                        <div class="input-group">
-                            <input type="number" class="form-control" placeholder="Range start (1)" name="range_start"
-                                min="1" max="500">
-                            <input type="number" class="form-control" placeholder="Range end (500)" name="range_end"
-                                min="1" max="500">
-                            <input type="number" class="form-control" placeholder="Custom speed (like 2.25)"
-                                name="custom_speed" min="0.1" max="10" step="0.01">
-                            <input type="text" class="form-control" placeholder="YouTube API key" name="youtube_api">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary ml-5 text-dark-dm shadow-none"
-                                    type="submit">Analyze</button>
-                            </div>
-                        </div>
-                    </form>
+                    <a href="https://github.com/sharatsachin/ytplaylist-len" target="_blank"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        aria-label="GitHub">
+                        <i class="fab fa-github text-sm"></i>
+                    </a>
                 </div>
             </div>
+        </nav>
 
-            <div class="container">
-                {% for block in playlist_detail %}
-                <div class="card">
-                    <div class="card-body">
-                        {% for x in block %}
-                        {% if loop.first %}
-                        <p class="first-line" style="font-weight: bold;">{{ x |
-                            safe
-                            }}</p>
-                        {% else %}
-                        <p class="description">{{ x | safe }}</p>
-                        {% endif %}
-                        {% endfor %}
+        <!-- Main content -->
+        <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 space-y-4">
+
+            <!-- Form card -->
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5">
+                <h1 class="text-lg font-semibold">Find the length of any YouTube playlist</h1>
+
+                <form method="POST" onsubmit="return validateForm()" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-sm text-gray-500 dark:text-gray-400">
+                            Playlist link, ID, or video URL — one per line (up to 5)
+                        </label>
+                        <textarea autofocus
+                            class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none transition-colors"
+                            placeholder="youtube.com/playlist?list=ID1&#10;youtube.com/playlist?list=ID2"
+                            name="search_string" rows="4"
+                            required>{{ search_string or '' }}</textarea>
                     </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-sm text-gray-500 dark:text-gray-400">Optional settings</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <input type="number"
+                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                                placeholder="Range start" name="range_start" min="1" max="500">
+                            <input type="number"
+                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                                placeholder="Range end" name="range_end" min="1" max="500">
+                            <input type="number"
+                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                                placeholder="Speed (e.g. 2.25)" name="custom_speed" min="0.1" max="10" step="0.01">
+                            <input type="text"
+                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors col-span-2"
+                                placeholder="YouTube API key (optional)" name="youtube_api">
+                            <input type="number"
+                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                                placeholder="Videos watched" name="watched_count" min="1" max="500"
+                                value="{{ watched_count or '' }}">
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="px-5 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-sm font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                        Analyze Playlist
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results -->
+            {% if playlist_detail %}
+            <div class="space-y-3">
+                {% for block in playlist_detail %}
+                <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-1.5">
+                    {% for x in block %}
+                    {% if loop.first %}
+                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ x | safe }}</p>
+                    {% else %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ x | safe }}</p>
+                    {% endif %}
+                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>
+            {% endif %}
 
-            <div class="container">
-                <div class="content">
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
-                         crossorigin="anonymous"></script>
-                    <!-- Below form -->
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-8874895270666721"
-                         data-ad-slot="4571294072"
-                         data-ad-format="auto"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+            <!-- Progress -->
+            {% if progress %}
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-3">
+                <p class="font-semibold">Playlist Progress</p>
+                <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                    <span>{{ progress.watched }} / {{ progress.total }} videos watched</span>
+                    <span>{{ progress.watched_pct }}%</span>
+                </div>
+                <div class="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-red-500 rounded-full" style="width: {{ progress.watched_pct }}%"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 pt-1">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Watched</p>
+                        <p class="text-sm font-medium">{{ progress.watched_duration }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Remaining</p>
+                        <p class="text-sm font-medium">{{ progress.remaining_duration }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Total</p>
+                        <p class="text-sm font-medium">{{ progress.total_duration }}</p>
+                    </div>
                 </div>
             </div>
+            {% endif %}
 
-
-        </div>
-        <!-- Content wrapper end -->
-
-
-        <!-- Navbar fixed bottom start -->
-        <nav class="navbar navbar-fixed-bottom bg-light-lm">
-            <div class="footer-content mx-auto">
-                Made with ❤ by <a href="https://www.sharats.dev"> Sharat Sachin</a>.
-                Buy me a <a href="https://ko-fi.com/sharat">coffee.</a>
+            <!-- Ad -->
+            <div>
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
+                    crossorigin="anonymous"></script>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8874895270666721"
+                    data-ad-slot="4571294072" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
-        </nav>
-        <!-- Navbar fixed bottom end -->
-    </div>
-    <!-- Page wrapper end -->
 
-    <script src="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/js/halfmoon.min.js"></script>
-    <script>
-        // dark mode toggler
-        function toggleDemo() {
-            halfmoon.toggleDarkMode();
-        }
-    </script>
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+            <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+                <a href="/" class="hover:text-red-500 transition-colors">Playlist Length</a>
+                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
+                <a href="/thumbnails" class="hover:text-red-500 transition-colors">Thumbnail Downloader</a>
+                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
+                <a href="/timestamp" class="hover:text-red-500 transition-colors">Timestamp Generator</a>
+                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
+                <a href="https://ds-interview.sharats.dev/" target="_blank"
+                    class="hover:text-red-500 transition-colors">DS Interview</a>
+            </div>
+        </footer>
+
+    </div>
 </body>
 
 </html>

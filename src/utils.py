@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import re
 from urllib.parse import urlencode
 
 import aiohttp
@@ -47,6 +48,11 @@ async def call_youtube_api(url_type, api, **kwargs):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             return json.loads(await response.text())
+
+
+def extract_video_id(url):
+    match = re.search(r'(?:v=|youtu\.be/)([a-zA-Z0-9_-]{11})', url)
+    return match.group(1) if match else None
 
 
 def parse(a):
