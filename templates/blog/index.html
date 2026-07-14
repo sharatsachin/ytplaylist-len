@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('blog_page_title') }}{% endblock %}
+{% block description %}{{ t('blog_meta_description') }}{% endblock %}
+{% block canonical_path %}/blog{% endblock %}
+{% block alt_path %}/blog{% endblock %}
+{% block xdefault_path %}/blog{% endblock %}
+{% block og_url %}/blog{% endblock %}
+{% block og_type %}website{% endblock %}
+{% block og_title %}{{ t('blog_page_title') }}{% endblock %}
+{% block og_description %}{{ t('blog_meta_description') }}{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "YouTube Playlist Length Blog",
+  "url": "{{ base_url }}/blog",
+  "description": {{ t('blog_meta_description') | tojson }},
+  "blogPost": [
+    {% for post in posts %}
+    {
+      "@type": "BlogPosting",
+      "headline": {{ post.title | tojson }},
+      "url": {{ (base_url + ('/' + lang if lang != 'en' else '') + '/blog/' + post.slug) | tojson }},
+      "datePublished": {{ post.date | tojson }},
+      "description": {{ post.description | tojson }}
+    }{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"Home","item":"{{ base_url }}/"},
+    {"@type":"ListItem","position":2,"name":"Blog","item":"{{ base_url }}/blog"}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<header class="space-y-2">
+    <h1 class="text-2xl font-semibold">{{ t('blog_h1') }}</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('blog_sub') }}</p>
+</header>
+
+{% if not_found %}
+<div class="bg-white dark:bg-gray-900 rounded-2xl border border-red-200 dark:border-red-900 shadow-sm p-5">
+    <p class="text-sm font-medium text-red-600 dark:text-red-400">Post not found.</p>
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for post in posts %}
+    <a href="{% if lang != 'en' %}/{{ lang }}{% endif %}/blog/{{ post.slug }}"
+       class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 hover:border-red-300 dark:hover:border-red-700 transition-colors block group">
+        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-2">
+            <time datetime="{{ post.date }}">{{ post.date_display }}</time>
+            <span>•</span>
+            <span>{{ t('blog_min_read', n=post.reading_time) }}</span>
+        </div>
+        <h2 class="text-base font-semibold group-hover:text-red-500 transition-colors">{{ post.title }}</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-3">{{ post.description }}</p>
+        <div class="mt-3 flex flex-wrap gap-1.5">
+            {% for tag in post.tags %}
+            <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">{{ tag }}</span>
+            {% endfor %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

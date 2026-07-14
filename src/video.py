@@ -55,19 +55,24 @@ class Video:
     def __repr__(self):
         return f"Video(video_id={self.video_id}, title={self.title}, duration={self.duration})"
 
-    def get_output_string(self):
-        output_string = [
-            "Video : " + self.title,
-            "ID : " + self.video_id,
-            "Duration : " + parse(self.duration),
-            "At 1.25x : " + parse(self.duration / 1.25),
-            "At 1.50x : " + parse(self.duration / 1.5),
-            "At 1.75x : " + parse(self.duration / 1.75),
-            "At 2.00x : " + parse(self.duration / 2),
+    def get_output(self):
+        """Return a list of (label_key, value, format_kwargs) tuples for i18n rendering."""
+        output = [
+            ("result_video", self.title, {}),
+            ("result_id", self.video_id, {}),
+            ("result_duration", parse(self.duration), {}),
+            ("result_at_125x", parse(self.duration / 1.25), {}),
+            ("result_at_150x", parse(self.duration / 1.5), {}),
+            ("result_at_175x", parse(self.duration / 1.75), {}),
+            ("result_at_200x", parse(self.duration / 2), {}),
         ]
-
         if self.custom_speed:
-            output_string.append(
-                f"At {self.custom_speed:.2f}x : {parse(self.duration / self.custom_speed)}"
-            )
-        return output_string
+            output.append((
+                "result_at_custom",
+                parse(self.duration / self.custom_speed),
+                {"speed": f"{self.custom_speed:.2f}"},
+            ))
+        return output
+
+    def get_output_string(self):
+        return [f"{key}:{val}" for key, val, _ in self.get_output()]

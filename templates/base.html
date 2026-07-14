@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default('en') }}"{% if rtl %} dir="rtl"{% endif %} class="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Sharat Sachin" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#dc2626" />
+
+    <title>{% block title %}YouTube Playlist Length — Find Any Playlist Duration Instantly{% endblock %}</title>
+    <meta name="description" content="{% block description %}Calculate the total length and duration of any YouTube playlist in seconds. Supports multiple playlists, custom playback speeds, progress tracking, and watch schedule planning.{% endblock %}" />
+    <meta name="keywords" content="{% block keywords %}youtube playlist length, youtube playlist duration, youtube watch time calculator, how long is youtube playlist, playlist time calculator{% endblock %}" />
+
+    <!-- Canonical & hreflang -->
+    <link rel="canonical" href="{{ base_url }}{% block canonical_path %}/{% endblock %}" />
+    {% if locales %}
+    {% for loc in locales %}
+    <link rel="alternate" hreflang="{{ loc.code }}" href="{{ base_url }}{% if loc.code != 'en' %}/{{ loc.code }}{% endif %}{% block alt_path %}/{% endblock %}" />
+    {% endfor %}
+    <link rel="alternate" hreflang="x-default" href="{{ base_url }}{% block xdefault_path %}/{% endblock %}" />
+    {% endif %}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+    <meta property="og:site_name" content="YouTube Playlist Length" />
+    <meta property="og:title" content="{% block og_title %}YouTube Playlist Length — Find Any Playlist Duration Instantly{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}Calculate the total length and duration of any YouTube playlist in seconds. Free, fast, no login required.{% endblock %}" />
+    <meta property="og:url" content="{{ base_url }}{% block og_url %}/{% endblock %}" />
+    <meta property="og:image" content="{{ base_url }}/static/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="{{ og_locale | default('en_US') }}" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@sharatsachin" />
+    <meta name="twitter:title" content="{% block tw_title %}YouTube Playlist Length{% endblock %}" />
+    <meta name="twitter:description" content="{% block tw_description %}Calculate the total length and duration of any YouTube playlist.{% endblock %}" />
+    <meta name="twitter:image" content="{{ base_url }}/static/og-image.png" />
+
+    <!-- Favicon & manifest -->
+    <link rel="icon" href="{{ url_for('static', path='/favicon.png') }}" />
+    <link rel="apple-touch-icon" href="{{ url_for('static', path='/favicon.png') }}" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Preconnect to 3rd-party origins -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.googleapis.com" />
+    <link rel="dns-prefetch" href="https://img.youtube.com" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        if (localStorage.theme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+                document.getElementById('dark-icon').classList.replace('fa-moon','fa-sun');
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+                document.getElementById('dark-icon').classList.replace('fa-sun','fa-moon');
+            }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        crossorigin="anonymous" />
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6W24HY1SKP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-6W24HY1SKP');
+    </script>
+
+    <!-- AdSense loader (single instance) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
+        crossorigin="anonymous"></script>
+
+    <!-- Sitewide JSON-LD: Organization + WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "{{ base_url }}/#organization",
+          "name": "YouTube Playlist Length",
+          "url": "{{ base_url }}",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{{ base_url }}/static/logo.png",
+            "width": 200,
+            "height": 60
+          },
+          "sameAs": ["https://github.com/sharatsachin/ytplaylist-len"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ base_url }}/#website",
+          "url": "{{ base_url }}",
+          "name": "YouTube Playlist Length",
+          "description": "Calculate the total length and duration of any YouTube playlist instantly.",
+          "publisher": { "@id": "{{ base_url }}/#organization" }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Per-page JSON-LD -->
+    {% block jsonld %}{% endblock %}
+
+    {% block head_extra %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div class="flex flex-col min-h-screen">
+
+        <!-- Navbar -->
+        <nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
+            <div class="max-w-5xl mx-auto px-6 h-16 flex items-center gap-3">
+                <a href="{{ '/' if lang == 'en' else '/' + lang + '/' }}" class="flex items-center">
+                    <img src="{{ url_for('static', path='/logo.png') }}" alt="YouTube Playlist Length" class="h-11" width="180" height="44" />
+                </a>
+                <span class="text-xs font-mono bg-red-600 text-white px-2 py-0.5 rounded-full select-none">v3.0</span>
+                <div class="ml-auto flex items-center gap-1">
+                    <!-- Language switcher -->
+                    {% if locales %}
+                    <div class="relative group">
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Change language" aria-haspopup="true">
+                            <i class="fa fa-globe text-sm"></i>
+                        </button>
+                        <div class="absolute right-0 mt-1 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg py-1 hidden group-hover:block z-50 max-h-80 overflow-y-auto">
+                            {% for loc in locales %}
+                            <a href="{{ '/' if loc.code == 'en' else '/' + loc.code + '/' }}{{ current_path | default('') }}"
+                               class="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors {% if loc.code == lang %}text-red-600 dark:text-red-400 font-medium{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                                <span>{{ loc.native_name }}</span>
+                                <span class="text-xs text-gray-400 ml-auto">{{ loc.code }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- Dark mode toggle -->
+                    <button onclick="toggleDarkMode()"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        aria-label="Toggle dark mode">
+                        <i id="dark-icon" class="fa fa-moon text-sm"></i>
+                    </button>
+                    <a href="https://github.com/sharatsachin/ytplaylist-len" target="_blank" rel="noopener noreferrer"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        aria-label="GitHub">
+                        <i class="fab fa-github text-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 space-y-4">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+            <div class="max-w-5xl mx-auto px-6 py-4">
+                <div class="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <a href="{{ '/' if lang == 'en' else '/' + lang + '/' }}" class="hover:text-red-500 transition-colors">{{ t('nav_playlist_length') }}</a>
+                    <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
+                    <a href="{{ '/thumbnails' if lang == 'en' else '/' + lang + '/thumbnails' }}" class="hover:text-red-500 transition-colors">{{ t('nav_thumbnail_downloader') }}</a>
+                    <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
+                    <a href="{{ '/timestamp' if lang == 'en' else '/' + lang + '/timestamp' }}" class="hover:text-red-500 transition-colors">{{ t('nav_timestamp_generator') }}</a>
+                    <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
+                    <a href="{{ '/blog' if lang == 'en' else '/' + lang + '/blog' }}" class="hover:text-red-500 transition-colors">{{ t('nav_blog') }}</a>
+                    <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
+                    <a href="https://ds-interview.sharats.dev/" target="_blank" rel="noopener noreferrer"
+                        class="hover:text-red-500 transition-colors">DS Interview</a>
+                </div>
+                <p class="text-center text-xs text-gray-400 dark:text-gray-600">
+                    &copy; {{ current_year }} YouTube Playlist Length &mdash; made with <span class="text-red-500" aria-label="love">&#9829;</span> by <a href="https://github.com/sharatsachin" class="hover:text-red-500 transition-colors" rel="noopener noreferrer">Sharat Sachin</a>
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    {% block body_extra %}{% endblock %}
+</body>
+
+</html>

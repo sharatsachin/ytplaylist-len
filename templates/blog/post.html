@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+{% block description %}{{ post.description }}{% endblock %}
+{% block keywords %}{{ post.tags | join(', ') }}{% endblock %}
+{% block canonical_path %}/blog/{{ post.slug }}{% endblock %}
+{% block alt_path %}/blog/{{ post.slug }}{% endblock %}
+{% block xdefault_path %}/blog/{{ post.slug }}{% endblock %}
+{% block og_url %}/blog/{{ post.slug }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.description }}{% endblock %}
+{% block tw_title %}{{ post.title }}{% endblock %}
+{% block tw_description %}{{ post.description }}{% endblock %}
+
+{% block head_extra %}
+{% if not post.is_translated %}
+<meta name="robots" content="noindex, follow" />
+{% endif %}
+<style>
+.prose h2 { font-size: 1.35rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; }
+.prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.prose p { margin: 0.75rem 0; line-height: 1.7; color: rgb(75 85 99); }
+.dark .prose p { color: rgb(209 213 219); }
+.prose ul, .prose ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li { margin: 0.35rem 0; line-height: 1.6; color: rgb(75 85 99); }
+.dark .prose li { color: rgb(209 213 219); }
+.prose a { color: rgb(220 38 38); text-decoration: underline; }
+.prose a:hover { color: rgb(185 28 28); }
+.prose code { background: rgb(243 244 246); padding: 0.15rem 0.35rem; border-radius: 0.25rem; font-size: 0.9em; }
+.dark .prose code { background: rgb(31 41 55); }
+.prose pre { background: rgb(31 41 55); color: rgb(229 231 235); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+.prose blockquote { border-left: 3px solid rgb(220 38 38); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: rgb(107 114 128); }
+.prose strong { font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ post.title | tojson }},
+  "description": {{ post.description | tojson }},
+  "datePublished": {{ post.date | tojson }},
+  "dateModified": {{ (post.updated or post.date) | tojson }},
+  "author": {"@type":"Person","name":{{ post.author | tojson }}},
+  "publisher": {"@id":{{ (base_url + '/#organization') | tojson }}},
+  "mainEntityOfPage": {"@type":"WebPage","@id":{{ (base_url + '/blog/' + post.slug) | tojson }}},
+  "keywords": {{ (post.tags | join(', ')) | tojson }}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"Home","item":"{{ base_url }}/"},
+    {"@type":"ListItem","position":2,"name":"Blog","item":"{{ base_url }}/blog"},
+    {"@type":"ListItem","position":3,"name":"{{ post.title | e }}","item":"{{ base_url }}/blog/{{ post.slug }}"}
+  ]
+}
+</script>
+{% if post.faq %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for item in post.faq %}
+    {"@type":"Question","name":"{{ item.q | e }}","acceptedAnswer":{"@type":"Answer","text":"{{ item.a | e }}"}}{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<article class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 md:p-8 space-y-4">
+    <a href="{% if lang != 'en' %}/{{ lang }}{% endif %}/blog" class="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 inline-block">{{ t('blog_back') }}</a>
+
+    <header class="space-y-3">
+        <h1 class="text-2xl md:text-3xl font-bold leading-tight">{{ post.title }}</h1>
+        <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span>{{ post.author }}</span>
+            <span>•</span>
+            <time datetime="{{ post.date }}">{{ post.date_display }}</time>
+            <span>•</span>
+            <span>{{ t('blog_min_read', n=post.reading_time) }}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+            {% for tag in post.tags %}
+            <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% if post.description %}
+        <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed">{{ post.description }}</p>
+        {% endif %}
+    </header>
+
+    <div class="prose max-w-none">
+        {{ post.body_html | safe }}
+    </div>
+
+    {% if post.faq %}
+    <section class="border-t border-gray-100 dark:border-gray-800 pt-6 mt-6">
+        <h2 class="text-lg font-semibold mb-3">{{ t('faq_title') }}</h2>
+        <div class="space-y-2">
+            {% for item in post.faq %}
+            <details class="group border border-gray-100 dark:border-gray-800 rounded-xl">
+                <summary class="cursor-pointer list-none flex justify-between items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl">
+                    <span class="text-sm font-medium">{{ item.q }}</span>
+                    <span class="text-gray-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+                </summary>
+                <div class="px-4 pb-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ item.a }}</div>
+            </details>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="border-t border-gray-100 dark:border-gray-800 pt-6 mt-6 flex items-center justify-between gap-3">
+        <a href="{{ '/' if lang == 'en' else '/' + lang + '/' }}"
+           class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition-colors">
+           {{ t('cta_try') }}
+        </a>
+    </div>
+</article>
+
+{% if related %}
+<section class="space-y-3">
+    <h2 class="text-lg font-semibold">Related posts</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {% for r in related %}
+        <a href="{% if lang != 'en' %}/{{ lang }}{% endif %}/blog/{{ r.slug }}"
+           class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-4 hover:border-red-300 dark:hover:border-red-700 transition-colors block">
+           <p class="font-medium text-sm">{{ r.title }}</p>
+           <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ r.description }}</p>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

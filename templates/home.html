@@ -1,195 +1,320 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description"
-        content="Get the total length/duration of a YouTube playlist by passing its link as input. You get the time required to watch that playlist at different speeds.">
+{% block title %}{{ t('home_page_title') }}{% endblock %}
+{% block description %}{{ t('home_meta_description') }}{% endblock %}
+{% block keywords %}{{ t('home_meta_keywords') }}{% endblock %}
+{% block canonical_path %}/{% endblock %}
+{% block alt_path %}/{% endblock %}
+{% block xdefault_path %}/{% endblock %}
+{% block og_url %}/{% endblock %}
+{% block og_title %}{{ t('home_page_title') }}{% endblock %}
+{% block og_description %}{{ t('home_meta_description') }}{% endblock %}
+{% block tw_title %}{{ t('home_page_title') }}{% endblock %}
+{% block tw_description %}{{ t('home_meta_description') }}{% endblock %}
 
-    <link rel="icon" href="{{url_for('static', path='/favicon.png')}}" />
-    <title>YouTube Playlist Length</title>
+{% block head_extra %}
+<script>
+window.__schedI18n = {
+    today: {{ t('schedule_today') | tojson }},
+    oneDay: {{ t('schedule_1_day') | tojson }},
+    nDays: {{ t('schedule_n_days', n='{n}') | tojson }},
+    planMore: {{ t('schedule_plan_more', n='{n}') | tojson }},
+    planEmpty: {{ t('schedule_plan_empty') | tojson }}
+};
+window.__formI18n = {
+    maxLines: {{ t('validation_max_lines') | tojson }},
+    minLineLength: {{ t('validation_min_line_length') | tojson }},
+    apiChars: {{ t('validation_api_chars') | tojson }},
+    apiLength: {{ t('validation_api_length') | tojson }}
+};
+</script>
+<script defer src="{{ url_for('static', path='/form_validation.js') }}"></script>
+<script defer src="{{ url_for('static', path='/js/schedule.js') }}"></script>
+{% endblock %}
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6W24HY1SKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-6W24HY1SKP');
-    </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
-        crossorigin="anonymous"></script>
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "YouTube Playlist Length",
+  "url": "{{ base_url }}/",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Web",
+  "description": {{ t('home_meta_description') | tojson }},
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": {{ t('howto_title') | tojson }},
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": {{ t('howto_step1_title') | tojson }}, "text": {{ t('howto_step1_text') | tojson }} },
+    { "@type": "HowToStep", "position": 2, "name": {{ t('howto_step2_title') | tojson }}, "text": {{ t('howto_step2_text') | tojson }} },
+    { "@type": "HowToStep", "position": 3, "name": {{ t('howto_step3_title') | tojson }}, "text": {{ t('howto_step3_text') | tojson }} }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":{{ t('faq_q1') | tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ t('faq_a1') | tojson }}}},
+    {"@type":"Question","name":{{ t('faq_q2') | tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ t('faq_a2') | tojson }}}},
+    {"@type":"Question","name":{{ t('faq_q3') | tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ t('faq_a3') | tojson }}}},
+    {"@type":"Question","name":{{ t('faq_q4') | tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ t('faq_a4') | tojson }}}},
+    {"@type":"Question","name":{{ t('faq_q5') | tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ t('faq_a5') | tojson }}}},
+    {"@type":"Question","name":{{ t('faq_q6') | tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ t('faq_a6') | tojson }}}}
+  ]
+}
+</script>
+{% endblock %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-        if (localStorage.theme === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.theme = 'light';
-            } else {
-                html.classList.add('dark');
-                localStorage.theme = 'dark';
-            }
-        }
-    </script>
+{% block content %}
+<!-- Form card -->
+<div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5">
+    <h1 class="text-lg font-semibold">{{ t('home_h1') }}</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 -mt-3">{{ t('home_sub') }}</p>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        crossorigin="anonymous" />
-    <script src="{{url_for('static', path='/form_validation.js')}}"></script>
-</head>
+    <form method="POST" onsubmit="return validateForm()" class="space-y-4">
+        <div class="space-y-1.5">
+            <label class="text-sm text-gray-500 dark:text-gray-400" for="search_string">
+                {{ t('label_playlist_or_video') }}
+            </label>
+            <textarea autofocus id="search_string"
+                class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none transition-colors"
+                placeholder="{{ t('placeholder_textarea') }}"
+                name="search_string" rows="4"
+                required>{{ search_string or '' }}</textarea>
+            <p id="search_string_error" class="text-xs text-red-500 hidden"></p>
+        </div>
 
-<body class="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-    <div class="flex flex-col min-h-screen">
+        <div class="space-y-1.5">
+            <label class="text-sm text-gray-500 dark:text-gray-400">{{ t('label_optional_settings') }}</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <input type="number" class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors" placeholder="{{ t('placeholder_range_start') }}" name="range_start" min="1" max="500">
+                <input type="number" class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors" placeholder="{{ t('placeholder_range_end') }}" name="range_end" min="1" max="500">
+                <input type="number" class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors" placeholder="{{ t('placeholder_speed') }}" name="custom_speed" min="0.1" max="10" step="0.01">
+                <input type="text" class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors col-span-2" placeholder="{{ t('placeholder_api_key') }}" name="youtube_api">
+                <input type="number" class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors" placeholder="{{ t('placeholder_watched_count') }}" name="watched_count" min="1" max="500" value="{{ watched_count or '' }}">
+            </div>
+            <p id="api_error" class="text-xs text-red-500 hidden"></p>
+        </div>
 
-        <!-- Navbar -->
-        <nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
-            <div class="max-w-5xl mx-auto px-6 h-16 flex items-center gap-3">
-                <a href="/" class="flex items-center">
-                    <img src="{{url_for('static', path='/logo.png')}}" alt="YouTube Playlist Length" class="h-11" />
-                </a>
-                <span class="text-xs font-mono bg-red-600 text-white px-2 py-0.5 rounded-full select-none">v3.0</span>
-                <div class="ml-auto flex items-center gap-1">
-                    <button onclick="toggleDarkMode()"
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        aria-label="Toggle dark mode">
-                        <i class="fa fa-moon text-sm"></i>
-                    </button>
-                    <a href="https://github.com/sharatsachin/ytplaylist-len" target="_blank"
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        aria-label="GitHub">
-                        <i class="fab fa-github text-sm"></i>
-                    </a>
+        <button type="submit"
+            class="px-5 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-sm font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+            {{ t('btn_analyze') }}
+        </button>
+    </form>
+</div>
+
+<!-- Results -->
+{% if playlist_detail %}
+<div class="space-y-3">
+    {% for block in playlist_detail %}
+    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-1.5">
+        {% for item in block %}
+            {% set label_key = item[0] %}
+            {% set value = item[1] %}
+            {% set kwargs = item[2] if item|length > 2 else {} %}
+            {% if label_key.startswith('error_') %}
+                <p class="font-semibold text-red-600 dark:text-red-400">{{ t(label_key) }}</p>
+            {% elif loop.first %}
+                <p class="font-semibold text-gray-900 dark:text-gray-100">{{ t(label_key) }}: {{ value }}</p>
+            {% else %}
+                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <span class="text-gray-500 dark:text-gray-500">{{ t(label_key, **kwargs) }}:</span> {{ value }}
+                </p>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Embedded playlist data for schedule.js -->
+{% if playlist_data_json %}
+<script type="application/json" id="playlist-data">{{ playlist_data_json | safe }}</script>
+{% endif %}
+
+<!-- Watch Schedule Calculator -->
+<div id="schedule-card" class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-4">
+    <div class="flex items-center justify-between">
+        <h2 class="font-semibold">{{ t('schedule_title') }}</h2>
+        <span id="schedule-empty" class="text-xs text-gray-400 dark:text-gray-500">{{ t('schedule_no_data') }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1" for="sched-hours">{{ t('schedule_hours_per_day') }}</label>
+                    <input type="number" id="sched-hours" min="0" max="24" value="1" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1" for="sched-minutes">{{ t('schedule_minutes_per_day') }}</label>
+                    <input type="number" id="sched-minutes" min="0" max="59" value="0" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
                 </div>
             </div>
-        </nav>
 
-        <!-- Main content -->
-        <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 space-y-4">
-
-            <!-- Form card -->
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5">
-                <h1 class="text-lg font-semibold">Find the length of any YouTube playlist</h1>
-
-                <form method="POST" onsubmit="return validateForm()" class="space-y-4">
-                    <div class="space-y-1.5">
-                        <label class="text-sm text-gray-500 dark:text-gray-400">
-                            Playlist link, ID, or video URL — one per line (up to 5)
-                        </label>
-                        <textarea autofocus
-                            class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none transition-colors"
-                            placeholder="youtube.com/playlist?list=ID1&#10;youtube.com/playlist?list=ID2"
-                            name="search_string" rows="4"
-                            required>{{ search_string or '' }}</textarea>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-sm text-gray-500 dark:text-gray-400">Optional settings</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            <input type="number"
-                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                                placeholder="Range start" name="range_start" min="1" max="500">
-                            <input type="number"
-                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                                placeholder="Range end" name="range_end" min="1" max="500">
-                            <input type="number"
-                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                                placeholder="Speed (e.g. 2.25)" name="custom_speed" min="0.1" max="10" step="0.01">
-                            <input type="text"
-                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors col-span-2"
-                                placeholder="YouTube API key (optional)" name="youtube_api">
-                            <input type="number"
-                                class="px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                                placeholder="Videos watched" name="watched_count" min="1" max="500"
-                                value="{{ watched_count or '' }}">
-                        </div>
-                    </div>
-
-                    <button type="submit"
-                        class="px-5 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-sm font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                        Analyze Playlist
-                    </button>
-                </form>
-            </div>
-
-            <!-- Results -->
-            {% if playlist_detail %}
-            <div class="space-y-3">
-                {% for block in playlist_detail %}
-                <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-1.5">
-                    {% for x in block %}
-                    {% if loop.first %}
-                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ x | safe }}</p>
-                    {% else %}
-                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ x | safe }}</p>
-                    {% endif %}
+            <div>
+                <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">{{ t('schedule_days_of_week') }}</label>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for d in [('1', t('schedule_day_mon')), ('2', t('schedule_day_tue')), ('3', t('schedule_day_wed')), ('4', t('schedule_day_thu')), ('5', t('schedule_day_fri')), ('6', t('schedule_day_sat')), ('0', t('schedule_day_sun'))] %}
+                    <label class="cursor-pointer">
+                        <input type="checkbox" class="sched-day peer sr-only" value="{{ d[0] }}" checked>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg border text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-600 transition-colors select-none">{{ d[1] }}</span>
+                    </label>
                     {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-            {% endif %}
 
-            <!-- Progress -->
-            {% if progress %}
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-3">
-                <p class="font-semibold">Playlist Progress</p>
-                <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-                    <span>{{ progress.watched }} / {{ progress.total }} videos watched</span>
-                    <span>{{ progress.watched_pct }}%</span>
-                </div>
-                <div class="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-red-500 rounded-full" style="width: {{ progress.watched_pct }}%"></div>
-                </div>
-                <div class="grid grid-cols-3 gap-4 pt-1">
-                    <div>
-                        <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Watched</p>
-                        <p class="text-sm font-medium">{{ progress.watched_duration }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Remaining</p>
-                        <p class="text-sm font-medium">{{ progress.remaining_duration }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Total</p>
-                        <p class="text-sm font-medium">{{ progress.total_duration }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Ad -->
             <div>
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
-                    crossorigin="anonymous"></script>
-                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8874895270666721"
-                    data-ad-slot="4571294072" data-ad-format="auto" data-full-width-responsive="true"></ins>
-                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1" for="sched-speed">{{ t('schedule_speed') }}</label>
+                <select id="sched-speed" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <option value="1">1.00x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.50x</option>
+                    <option value="1.75">1.75x</option>
+                    <option value="2">2.00x</option>
+                </select>
             </div>
 
-        </main>
+            <label class="flex items-center gap-2 cursor-pointer select-none pt-1">
+                <input type="checkbox" id="sched-start-today" checked class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500 bg-gray-50 dark:bg-gray-800">
+                <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('schedule_start_today') }}</span>
+                <span class="text-xs text-gray-400 dark:text-gray-500">— {{ t('schedule_start_today_hint') }}</span>
+            </label>
+        </div>
 
-        <!-- Footer -->
-        <footer class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
-            <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-                <a href="/" class="hover:text-red-500 transition-colors">Playlist Length</a>
-                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
-                <a href="/thumbnails" class="hover:text-red-500 transition-colors">Thumbnail Downloader</a>
-                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
-                <a href="/timestamp" class="hover:text-red-500 transition-colors">Timestamp Generator</a>
-                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
-                <a href="https://ds-interview.sharats.dev/" target="_blank"
-                    class="hover:text-red-500 transition-colors">DS Interview</a>
+        <div class="flex flex-col items-center justify-center space-y-3">
+            <div class="relative w-40 h-40" aria-label="Progress ring">
+                <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="10" class="text-gray-200 dark:text-gray-800"/>
+                    <circle id="sched-ring" cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" class="text-red-500 transition-all duration-500"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span id="sched-pct" class="text-2xl font-semibold">0%</span>
+                    <span id="sched-videos" class="text-xs text-gray-500 dark:text-gray-400">0/0</span>
+                </div>
             </div>
-        </footer>
-
+            <div class="text-center">
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('schedule_finish_date') }}</p>
+                <p id="sched-date" class="text-sm font-medium">—</p>
+                <p id="sched-days" class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">—</p>
+            </div>
+        </div>
     </div>
-</body>
 
-</html>
+    <div class="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100 dark:border-gray-800">
+        <div>
+            <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">{{ t('progress_watched_label') }}</p>
+            <p id="sched-watched" class="text-sm font-medium">—</p>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">{{ t('progress_remaining_label') }}</p>
+            <p id="sched-remaining" class="text-sm font-medium">—</p>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">{{ t('progress_total_label') }}</p>
+            <p id="sched-total" class="text-sm font-medium">—</p>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Plan table (populated by schedule.js when a playlist is loaded) -->
+{% if playlist_data_json %}
+<div id="sched-plan" class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-3 hidden">
+    <div>
+        <h2 class="font-semibold">{{ t('schedule_plan_title') }}</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ t('schedule_plan_hint') }}</p>
+    </div>
+    <div class="overflow-x-auto -mx-1">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-left text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                    <th class="py-1.5 pr-3 font-medium">{{ t('schedule_col_date') }}</th>
+                    <th class="py-1.5 pr-3 font-medium">{{ t('schedule_col_day') }}</th>
+                    <th class="py-1.5 pr-3 font-medium">{{ t('schedule_col_videos') }}</th>
+                    <th class="py-1.5 font-medium">{{ t('schedule_col_duration') }}</th>
+                </tr>
+            </thead>
+            <tbody id="sched-plan-body"></tbody>
+        </table>
+    </div>
+    <p id="sched-plan-more" class="text-xs text-gray-500 dark:text-gray-400 hidden"></p>
+</div>
+{% endif %}
+
+<!-- Legacy server-side Progress card (fallback, kept for no-JS users) -->
+{% if progress %}
+<noscript>
+<div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-3">
+    <p class="font-semibold">{{ t('progress_title') }}</p>
+    <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+        <span>{{ t('progress_watched_of', watched=progress.watched, total=progress.total) }}</span>
+        <span>{{ progress.watched_pct }}%</span>
+    </div>
+    <div class="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div class="h-full bg-red-500 rounded-full" style="width: {{ progress.watched_pct }}%"></div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 pt-1">
+        <div><p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">{{ t('progress_watched_label') }}</p><p class="text-sm font-medium">{{ progress.watched_duration }}</p></div>
+        <div><p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">{{ t('progress_remaining_label') }}</p><p class="text-sm font-medium">{{ progress.remaining_duration }}</p></div>
+        <div><p class="text-xs text-gray-500 dark:text-gray-500 mb-0.5">{{ t('progress_total_label') }}</p><p class="text-sm font-medium">{{ progress.total_duration }}</p></div>
+    </div>
+</div>
+</noscript>
+{% endif %}
+
+<!-- Ad slot -->
+<div>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8874895270666721"
+        data-ad-slot="4571294072" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<!-- How-To section -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+    <h2 class="text-lg font-semibold mb-4">{{ t('howto_title') }}</h2>
+    <ol class="space-y-3 list-decimal list-inside">
+        <li>
+            <span class="font-medium">{{ t('howto_step1_title') }}</span>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 ml-6">{{ t('howto_step1_text') }}</p>
+        </li>
+        <li>
+            <span class="font-medium">{{ t('howto_step2_title') }}</span>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 ml-6">{{ t('howto_step2_text') }}</p>
+        </li>
+        <li>
+            <span class="font-medium">{{ t('howto_step3_title') }}</span>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 ml-6">{{ t('howto_step3_text') }}</p>
+        </li>
+    </ol>
+</section>
+
+<!-- Why section -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+    <h2 class="text-lg font-semibold mb-2">{{ t('why_title') }}</h2>
+    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ t('why_text') }}</p>
+</section>
+
+<!-- FAQ section -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+    <h2 class="text-lg font-semibold mb-4">{{ t('faq_title') }}</h2>
+    <div class="space-y-2">
+        {% for i in range(1, 7) %}
+        <details class="group border border-gray-100 dark:border-gray-800 rounded-xl">
+            <summary class="cursor-pointer list-none flex justify-between items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl">
+                <span class="text-sm font-medium">{{ t('faq_q' + i|string) }}</span>
+                <span class="text-gray-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+            </summary>
+            <div class="px-4 pb-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ t('faq_a' + i|string) }}</div>
+        </details>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,147 +1,137 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Generate a shareable YouTube timestamp link for any video and time.">
+{% block title %}{{ t('ts_page_title') }}{% endblock %}
+{% block description %}{{ t('ts_meta_description') }}{% endblock %}
+{% block keywords %}youtube timestamp link, youtube time link generator, share youtube at specific time, youtube start at time{% endblock %}
+{% block canonical_path %}/timestamp{% endblock %}
+{% block alt_path %}/timestamp{% endblock %}
+{% block xdefault_path %}/timestamp{% endblock %}
+{% block og_url %}/timestamp{% endblock %}
+{% block og_title %}{{ t('ts_page_title') }}{% endblock %}
+{% block og_description %}{{ t('ts_meta_description') }}{% endblock %}
+{% block tw_title %}{{ t('ts_page_title') }}{% endblock %}
+{% block tw_description %}{{ t('ts_meta_description') }}{% endblock %}
 
-    <link rel="icon" href="{{url_for('static', path='/favicon.png')}}" />
-    <title>YouTube Timestamp Link Generator</title>
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "YouTube Timestamp Link Generator",
+  "url": "{{ base_url }}/timestamp",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Web",
+  "description": {{ t('ts_meta_description') | tojson }},
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": {{ t('ts_howto_title') | tojson }},
+  "step": [
+    {"@type":"HowToStep","position":1,"name":{{ t('ts_howto_step1_title') | tojson }},"text":{{ t('ts_howto_step1_text') | tojson }}},
+    {"@type":"HowToStep","position":2,"name":{{ t('ts_howto_step2_title') | tojson }},"text":{{ t('ts_howto_step2_text') | tojson }}},
+    {"@type":"HowToStep","position":3,"name":{{ t('ts_howto_step3_title') | tojson }},"text":{{ t('ts_howto_step3_text') | tojson }}}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- for i in range(1, 7) %}
+    {"@type":"Question","name":{{ t('ts_faq_q' + i|string) | tojson }},"acceptedAnswer":{"@type":"Answer","text":{{ t('ts_faq_a' + i|string) | tojson }}}}{% if i < 6 %},{% endif %}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endblock %}
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6W24HY1SKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-6W24HY1SKP');
-    </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
-        crossorigin="anonymous"></script>
+{% block content %}
+<div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5">
+    <h1 class="text-lg font-semibold">{{ t('ts_h1') }}</h1>
+    <form method="POST" action="{{ '/timestamp' if lang == 'en' else '/' + lang + '/timestamp' }}" class="space-y-4">
+        <div class="space-y-1.5">
+            <label class="text-sm text-gray-500 dark:text-gray-400" for="video_url">{{ t('ts_label_url') }}</label>
+            <input autofocus type="text" id="video_url"
+                class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ" name="video_url" value="{{ video_url or '' }}" required />
+        </div>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-        if (localStorage.theme === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.theme = 'light';
-            } else {
-                html.classList.add('dark');
-                localStorage.theme = 'dark';
-            }
-        }
-    </script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        crossorigin="anonymous" />
-</head>
-
-<body class="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-    <div class="flex flex-col min-h-screen">
-
-        <!-- Navbar -->
-        <nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
-            <div class="max-w-5xl mx-auto px-6 h-16 flex items-center gap-3">
-                <a href="/" class="flex items-center">
-                    <img src="{{url_for('static', path='/logo.png')}}" alt="YouTube Playlist Length" class="h-11" />
-                </a>
-                <span class="text-xs font-mono bg-red-600 text-white px-2 py-0.5 rounded-full select-none">v3.0</span>
-                <div class="ml-auto flex items-center gap-1">
-                    <button onclick="toggleDarkMode()"
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        aria-label="Toggle dark mode">
-                        <i class="fa fa-moon text-sm"></i>
-                    </button>
-                    <a href="https://github.com/sharatsachin/ytplaylist-len" target="_blank"
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        aria-label="GitHub">
-                        <i class="fab fa-github text-sm"></i>
-                    </a>
-                </div>
+        <div class="space-y-1.5">
+            <label class="text-sm text-gray-500 dark:text-gray-400">{{ t('ts_label_timestamp') }}</label>
+            <div class="flex gap-2">
+                <input type="number" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors" placeholder="{{ t('ts_placeholder_hours') }}" name="hours" min="0" value="{{ hours or '' }}" />
+                <input type="number" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors" placeholder="{{ t('ts_placeholder_minutes') }}" name="minutes" min="0" max="59" value="{{ minutes or '' }}" />
+                <input type="number" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors" placeholder="{{ t('ts_placeholder_seconds') }}" name="seconds" min="0" max="59" value="{{ seconds or '' }}" />
             </div>
-        </nav>
+        </div>
 
-        <!-- Main content -->
-        <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 space-y-4">
+        <button type="submit"
+            class="px-5 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-sm font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+            {{ t('btn_generate_link') }}
+        </button>
+    </form>
+</div>
 
-            <!-- Form card -->
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5">
-                <h1 class="text-lg font-semibold">Generate a YouTube timestamp link</h1>
+{% if result %}
+<div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-3">
+    {% if result.error %}
+    <p class="text-sm font-medium text-red-600 dark:text-red-400">{{ t('error_invalid_url') }}</p>
+    {% else %}
+    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ t('ts_result_label', label=result.label) }}</p>
+    <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer"
+        class="block text-sm text-red-600 dark:text-red-400 hover:underline break-all">{{ result.link }}</a>
+    <button
+        class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+        onclick="navigator.clipboard.writeText('{{ result.link }}'); this.textContent = '{{ t('btn_copied') }}';">
+        {{ t('btn_copy') }}
+    </button>
+    {% endif %}
+</div>
+{% endif %}
 
-                <form method="POST" class="space-y-4">
-                    <div class="space-y-1.5">
-                        <label class="text-sm text-gray-500 dark:text-gray-400">YouTube video URL</label>
-                        <input autofocus type="text"
-                            class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                            placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                            name="video_url" required />
-                    </div>
+<!-- How-To section -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+    <h2 class="text-lg font-semibold mb-4">{{ t('ts_howto_title') }}</h2>
+    <ol class="space-y-3 list-decimal list-inside">
+        <li>
+            <span class="font-medium">{{ t('ts_howto_step1_title') }}</span>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 ml-6">{{ t('ts_howto_step1_text') }}</p>
+        </li>
+        <li>
+            <span class="font-medium">{{ t('ts_howto_step2_title') }}</span>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 ml-6">{{ t('ts_howto_step2_text') }}</p>
+        </li>
+        <li>
+            <span class="font-medium">{{ t('ts_howto_step3_title') }}</span>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 ml-6">{{ t('ts_howto_step3_text') }}</p>
+        </li>
+    </ol>
+</section>
 
-                    <div class="space-y-1.5">
-                        <label class="text-sm text-gray-500 dark:text-gray-400">Timestamp</label>
-                        <div class="flex gap-2">
-                            <input type="number"
-                                class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                                placeholder="Hours" name="hours" min="0" />
-                            <input type="number"
-                                class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                                placeholder="Minutes" name="minutes" min="0" max="59" />
-                            <input type="number"
-                                class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                                placeholder="Seconds" name="seconds" min="0" max="59" />
-                        </div>
-                    </div>
+<!-- Why section -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+    <h2 class="text-lg font-semibold mb-2">{{ t('ts_why_title') }}</h2>
+    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ t('ts_why_text') }}</p>
+</section>
 
-                    <button type="submit"
-                        class="px-5 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-sm font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                        Generate Link
-                    </button>
-                </form>
-            </div>
-
-            <!-- Result -->
-            {% if result %}
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5 space-y-3">
-                {% if result.error %}
-                <p class="text-sm font-medium text-red-600 dark:text-red-400">{{ result.error }}</p>
-                {% else %}
-                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Timestamp link for {{ result.label }}</p>
-                <a href="{{ result.link }}" target="_blank"
-                    class="block text-sm text-red-600 dark:text-red-400 hover:underline break-all">{{ result.link }}</a>
-                <button
-                    class="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
-                    onclick="navigator.clipboard.writeText('{{ result.link }}'); this.textContent = 'Copied!';">
-                    Copy to clipboard
-                </button>
-                {% endif %}
-            </div>
-            {% endif %}
-
-        </main>
-
-        <!-- Footer -->
-        <footer class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
-            <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-                <a href="/" class="hover:text-red-500 transition-colors">Playlist Length</a>
-                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
-                <a href="/thumbnails" class="hover:text-red-500 transition-colors">Thumbnail Downloader</a>
-                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
-                <a href="/timestamp" class="hover:text-red-500 transition-colors">Timestamp Generator</a>
-                <span class="text-gray-300 dark:text-gray-700 select-none">•</span>
-                <a href="https://ds-interview.sharats.dev/" target="_blank"
-                    class="hover:text-red-500 transition-colors">DS Interview</a>
-            </div>
-        </footer>
-
+<!-- FAQ section -->
+<section class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+    <h2 class="text-lg font-semibold mb-4">{{ t('ts_faq_title') }}</h2>
+    <div class="space-y-2">
+        {% for i in range(1, 7) %}
+        <details class="group border border-gray-100 dark:border-gray-800 rounded-xl">
+            <summary class="cursor-pointer list-none flex justify-between items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl">
+                <span class="text-sm font-medium">{{ t('ts_faq_q' + i|string) }}</span>
+                <span class="text-gray-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+            </summary>
+            <div class="px-4 pb-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{{ t('ts_faq_a' + i|string) }}</div>
+        </details>
+        {% endfor %}
     </div>
-</body>
-
-</html>
+</section>
+{% endblock %}
